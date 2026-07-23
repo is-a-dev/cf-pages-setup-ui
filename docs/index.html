@@ -244,7 +244,7 @@
           resultBox.className = 'result show ok';
           resultBox.textContent =
             `Success! ${domain}.is-a.dev has been added to Cloudflare Pages.\n\n` +
-            `Continue reading the documentation to finish setting up your subdomain: https://docs.is-a.dev/guides/cloudflare-pages`;
+            `Continue reading the documentation to finish setting up your subdomain <a href="https://docs.is-a.dev/guides/cloudflare-pages">here</a>.`;
         } else {
           resultBox.className = 'result show err';
           const errs = (data.errors || []).map(e => `${e.code}: ${e.message}`).join('\n') || 'Unknown error';
