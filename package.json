@@ -1,0 +1,22 @@
+{
+  "name": "cf-pages-setup-ui",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/is-a-dev/cf-pages-setup-ui#readme",
+  "bugs": {
+    "url": "https://github.com/is-a-dev/cf-pages-setup-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/is-a-dev/cf-pages-setup-ui.git"
+  },
+  "license": "MIT",
+  "author": "William Harrison",
+  "type": "commonjs",
+  "main": "api.js",
+  "scripts": {},
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {}
+}
