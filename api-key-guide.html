@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Cloudflare API token | is-a.dev</title>
+  <style>
+    :root {
+      --bg: #0e1210;
+      --panel: #151a17;
+      --border: #262e28;
+      --text: #e7ede9;
+      --dim: #8ea298;
+      --accent: #f6821f;
+      --accent-dim: #7a4415;
+      --mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Inter", "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px 80px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 8px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px;
+      font-weight: 600;
+    }
+
+    .sub {
+      color: var(--dim);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 36px;
+    }
+
+    .step {
+      position: relative;
+      padding: 0 0 28px 44px;
+      border-left: 1px solid var(--border);
+      margin-left: 15px;
+    }
+
+    .step:last-child {
+      border-left: 1px solid transparent;
+      padding-bottom: 0;
+    }
+
+    .step-num {
+      position: absolute;
+      left: -16px;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .step h2 {
+      font-size: 15px;
+      margin: 3px 0 8px;
+      font-weight: 600;
+    }
+
+    .step p {
+      color: var(--dim);
+      font-size: 13.5px;
+      line-height: 1.65;
+      margin: 0 0 8px;
+    }
+
+    .step p:last-child {
+      margin-bottom: 0;
+    }
+
+    code,
+    .pill {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      background: #0b0e0c;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--text);
+    }
+
+    .box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 4px;
+    }
+
+    .perm-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      padding: 6px 0;
+    }
+
+    .perm-row .arrow {
+      color: var(--dim);
+    }
+
+    .perm-row .val {
+      color: var(--accent);
+    }
+
+    .warn {
+      margin-top: 36px;
+      border: 1px solid var(--accent-dim);
+      background: rgba(246, 130, 31, 0.06);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .warn strong {
+      color: var(--accent);
+    }
+
+    a {
+      color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <p class="eyebrow">is-a.dev &bull; Cloudflare Pages</p>
+    <h1>Create a Cloudflare API token</h1>
+    <p class="sub">You need a scoped token before you can add a domain to a Pages project. This takes about a minute and
+      only needs to be done once — you can reuse the same token for future domains.</p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <h2>Open the API tokens page</h2>
+      <p>Log in to the Cloudflare dashboard, then go to your profile icon (top right) → <strong>My Profile</strong> →
+        <strong>API Tokens</strong>.</p>
+      <p>Or go straight there: <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank"
+          rel="noopener">dash.cloudflare.com/profile/api-tokens</a></p>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <h2>Start a custom token</h2>
+      <p>Click <strong>Create Token</strong>, scroll to the bottom, and choose <strong>Create Custom Token</strong>
+        rather than one of the pre-built templates.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <h2>Set the permission</h2>
+      <p>Give the token a name you'll recognize later, like <code>pages-domain-tool</code>. Under
+        <strong>Permissions</strong>, add:</p>
+      <div class="box">
+        <div class="perm-row">
+          <span class="val">Account</span>
+          <span class="arrow">→</span>
+          <span class="val">Cloudflare Pages</span>
+          <span class="arrow">→</span>
+          <span class="val">Edit</span>
+        </div>
+      </div>
+      <p>This is the minimum scope needed to attach domains to a Pages project. No other permissions are required.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <h2>Scope it to your account</h2>
+      <p>Under <strong>Account Resources</strong>, select the specific account the Pages project lives in (rather than
+        "All accounts") to keep the token as narrow as possible.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <h2>Create and copy the token</h2>
+      <p>Click <strong>Continue to summary</strong>, review the permissions, then <strong>Create Token</strong>. Copy
+        the token immediately — Cloudflare only shows it once.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <h2>Find your Account ID</h2>
+      <p>You'll also need the Account ID for the form. It's shown on the right-hand sidebar of any domain's
+        <strong>Overview</strong> page in the dashboard, or in the URL:
+        <code>dash.cloudflare.com/&lt;account-id&gt;/...</code></p>
+    </div>
+
+    <div class="warn">
+      <strong>Keep it safe.</strong> Treat this token like a password — anyone with it can modify Pages domains on your
+      account. Store it in a password manager rather than a plain text file, and revoke it from the API Tokens page if
+      it's ever exposed.
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Cloudflare Pages | is-a.dev</title>
+  <style>
+    :root {
+      --bg: #0e1210;
+      --panel: #151a17;
+      --border: #262e28;
+      --text: #e7ede9;
+      --dim: #8ea298;
+      --accent: #f6821f;
+      /* cloudflare orange, used sparingly */
+      --accent-dim: #7a4415;
+      --ok: #3fbf7f;
+      --err: #e5534b;
+      --mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Inter", "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 6px;
+    }
+
+    h1 {
+      font-size: 19px;
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+
+    .sub {
+      color: var(--dim);
+      font-size: 13px;
+      margin: 0 0 24px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--dim);
+      margin: 16px 0 6px;
+    }
+
+    input {
+      width: 100%;
+      background: #0b0e0c;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus {
+      border-color: var(--accent-dim);
+    }
+
+    input::placeholder {
+      color: #4a564e;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 11px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #171310;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.05s;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    button:disabled {
+      background: var(--accent-dim);
+      color: #a68867;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 18px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result.ok {
+      border-color: var(--ok);
+      color: var(--ok);
+      background: rgba(63, 191, 127, 0.06);
+    }
+
+    .result.err {
+      border-color: var(--err);
+      color: var(--err);
+      background: rgba(229, 83, 75, 0.06);
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 11.5px;
+      color: var(--dim);
+      line-height: 1.6;
+    }
+
+    .note code {
+      background: #0b0e0c;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <p class="eyebrow">is-a.dev &bull; Cloudflare Pages</p>
+    <h1>Connect your is-a.dev subdomain</h1>
+    <p class="sub">You will need a Cloudflare API token with the <em>Pages: Edit</em> permission. Learn how to create a token with this permission <a href="/api-key-guide.html">here</a>.</p>
+
+    <form id="domain-form">
+      <label for="token">API Token</label>
+      <input id="token" type="password" placeholder="Cloudflare API token" autocomplete="off" required>
+
+      <label for="account">Cloudflare Account ID</label>
+      <input id="account" type="text" placeholder="e.g. 6f6a9c... (32-char hex)" autocomplete="off" required>
+
+      <label for="project">Cloudflare Pages Project Name</label>
+      <input id="project" type="text" placeholder="e.g. my-pages-project" autocomplete="off" required>
+
+      <label for="domain">Your Subdomain</label>
+      <input id="domain" type="text" placeholder="e.g. william" autocomplete="off" required>
+
+      <button type="submit" id="submit-btn">Add subdomain</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <p class="note">
+      Runs entirely in your browser — the token is sent directly to <code>api.cloudflare.com</code> and is never stored or logged.
+    </p>
+
+    <p class="note">View the source on <a href="https://github.com/is-a-dev/cf-pages-setup-ui">GitHub</a>.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('domain-form');
+    const resultBox = document.getElementById('result');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = document.getElementById('token').value.trim();
+      const account = document.getElementById('account').value.trim();
+      const project = document.getElementById('project').value.trim();
+      let domain = document.getElementById('domain').value.trim();
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Adding…';
+      resultBox.className = 'result show';
+      resultBox.textContent = 'Sending request…';
+
+      // If the user has entered a full domain (e.g. "william.is-a.dev"), strip it down to just the subdomain part.
+      const subdomainMatch = domain.match(/^([a-z0-9-]+)\.is-a\.dev$/i);
+      if (subdomainMatch) {
+        domain = subdomainMatch[1];
+      }
+
+      const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(account)}/pages/projects/${encodeURIComponent(project)}/domains`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name: `${domain}.is-a.dev` })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          resultBox.className = 'result show ok';
+          resultBox.textContent =
+            `Success! ${domain}.is-a.dev has been added to Cloudflare Pages.\n\n` +
+            `Continue reading the documentation to finish setting up your subdomain: https://docs.is-a.dev/guides/cloudflare-pages`;
+        } else {
+          resultBox.className = 'result show err';
+          const errs = (data.errors || []).map(e => `${e.code}: ${e.message}`).join('\n') || 'Unknown error';
+          resultBox.textContent = `Request failed (HTTP ${res.status})\n${errs}`;
+        }
+      } catch (err) {
+        resultBox.className = 'result show err';
+        resultBox.textContent = `Network error: ${err.message}\n\nThis is often a CORS restriction when calling the Cloudflare API directly from a browser page.`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Add domain';
+      }
+    });
+  </script>
+
+</body>
+
+</html>
